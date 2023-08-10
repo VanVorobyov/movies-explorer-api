@@ -8,17 +8,22 @@ const cors = require('cors');
 const router = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
 
+const { limiter } = require('./middlewares/limiter');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const { PORT = 3000, MONGODB = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
 const app = express();
 app.use(bodyParser.json());
 mongoose.connect(MONGODB);
-// TODO: сделать корс
+
+app.use(requestLogger);
+app.use(limiter);
 app.use(helmet());
+// TODO: сделать корс
 app.use(cors());
 app.use(router);
-
-// app.use(errorLogger);
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 
