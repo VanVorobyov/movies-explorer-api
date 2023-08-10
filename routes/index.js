@@ -9,10 +9,11 @@ const auth = require('../middlewares/auth');
 const NotFoundError = require('../utils/errors/notFoundError');
 
 router.use(authRoutes);
-router.use('/users', auth, userRoutes);
-router.use('/movies', auth, movieRoutes);
+router.use(auth);
+router.use('/users', userRoutes);
+router.use('/movies', movieRoutes);
 
-router.use('*', auth, (req, res, next) => {
+router.use('*', (req, res, next) => {
   next(new NotFoundError('Маршрут не найден'));
 });
 
