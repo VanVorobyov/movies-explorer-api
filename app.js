@@ -2,26 +2,31 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-
 const helmet = require('helmet');
 const cors = require('cors');
+
+const router = require('./routes');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000, MONGODB = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
-app.use(helmet());
-
 mongoose.connect(MONGODB);
+// TODO: сделать корс
+app.use(helmet());
+app.use(cors());
+app.use(router);
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-
+// app.use(errorLogger);
 app.use(errors());
+app.use(errorHandler);
+
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
