@@ -2,11 +2,10 @@ const router = require('express').Router();
 
 const { getSavedMovies, createMovie, deleteMovie } = require('../controllers/users');
 
-// TODO: Сделать валидацию
-// const { validateCurrentUser, validateUpdateUser } = require('../utils/validators/userValidator');
+const { validateMovieId, validateCreateMovie } = require('../utils/validators/movieValidator');
 
 router.get('/', getSavedMovies);
-router.post('/', createMovie);
-router.delete('/:_id', deleteMovie);
+router.post('/', validateCreateMovie, createMovie);
+router.delete('/:_id', validateMovieId, deleteMovie);
 
 module.exports = router;
