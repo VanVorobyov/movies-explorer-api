@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const UnauthorizedError = require('../utils/errors/unauthorizedError');
+const { EMAIL_ERROR, INCORRECT_EMAIL_OR_PASS, USER_NOT_FOUND } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -14,7 +17,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (v) => validator.isEmail(v),
-      message: 'Неправильный формат почты',
+      message: EMAIL_ERROR,
     },
   },
   password: {
@@ -23,5 +26,29 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
+// eslint-disable-next-line func-names
+userSchema.statics.findUserByCredentials = function ({ email, password }) {
+  return this.findOne({ email }).select('+password')
+    .orFail(() => new UnauthorizedError(USER_NOT_FOUND))
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new UnauthorizedError(INCORRECT_EMAIL_OR_PASS));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new UnauthorizedError(INCORRECT_EMAIL_OR_PASS));
+          }
+          return user;
+        });
+    });
+};
+
+userSchema.methods.toJSON = function passwordDelete() {
+  const user = { ...this.toObject() };
+  delete user.password;
+  return user;
+};
 
 module.exports = mongoose.model('user', userSchema);

@@ -2,19 +2,21 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { SECRET_STRING } = require('../utils/config');
+
 const ConflictError = require('../utils/errors/conflictError');
 const BadRequestError = require('../utils/errors/badRequestError');
+
+const { CREATED, INCORRECT_DATA_CREATE_USER, EMAIL_ALREADY_EXISTS } = require('../utils/constants');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User
     .findUserByCredentials({ email, password })
     .then((user) => {
-    // TODO: сделать импорт из конфига окружения
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        SECRET_STRING,
         { expiresIn: '7d' },
       );
       res.send({ token });
@@ -27,12 +29,12 @@ module.exports.createUser = (req, res, next) => {
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({ name, email, password: hash }))
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+      if (err.name === 'CastError') {
+        next(new BadRequestError(INCORRECT_DATA_CREATE_USER));
       } else if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует'));
+        next(new ConflictError(EMAIL_ALREADY_EXISTS));
       } else {
         next(err);
       }

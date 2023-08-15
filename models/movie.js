@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+const { URL_ERROR } = require('../utils/constants');
+
 const movieSchema = new mongoose.Schema({
   country: {
     type: String,
@@ -33,7 +35,7 @@ const movieSchema = new mongoose.Schema({
           require_protocol: true,
         },
       ),
-      message: 'Неправильный формат ссылки',
+      message: URL_ERROR,
     },
   },
   trailerLink: {
@@ -47,7 +49,7 @@ const movieSchema = new mongoose.Schema({
           require_protocol: true,
         },
       ),
-      message: 'Неправильный формат ссылки',
+      message: URL_ERROR,
     },
   },
   thumbnail: {
@@ -61,7 +63,7 @@ const movieSchema = new mongoose.Schema({
           require_protocol: true,
         },
       ),
-      message: 'Неправильный формат ссылки',
+      message: URL_ERROR,
     },
   },
   owner: {

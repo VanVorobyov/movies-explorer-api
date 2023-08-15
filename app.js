@@ -11,16 +11,15 @@ const errorHandler = require('./middlewares/errorHandler');
 const { limiter } = require('./middlewares/limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3000, MONGODB = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { SERVER_PORT, DB } = require('./utils/config');
 
 const app = express();
 app.use(bodyParser.json());
-mongoose.connect(MONGODB);
+mongoose.connect(DB);
 
 app.use(requestLogger);
-app.use(limiter);
+// app.use(limiter);
 app.use(helmet());
-// TODO: сделать корс
 app.use(cors());
 app.use(router);
 app.use(errorLogger);
@@ -33,7 +32,7 @@ app.use(errorHandler);
 //   }, 0);
 // });
 
-app.listen(PORT, () => {
+app.listen(SERVER_PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`App listening on port ${PORT}`);
+  console.log(`App listening on port ${SERVER_PORT}`);
 });
