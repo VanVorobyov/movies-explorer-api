@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 mongoose.connect(DB);
 
 app.use(requestLogger);
-// app.use(limiter);
+app.use(limiter);
 app.use(helmet());
 app.use(cors());
 app.use(router);
@@ -33,6 +33,5 @@ app.use(errorHandler);
 // });
 
 app.listen(SERVER_PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`App listening on port ${SERVER_PORT}`);
 });
