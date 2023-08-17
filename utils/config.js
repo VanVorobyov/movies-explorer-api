@@ -5,7 +5,7 @@ const {
 } = process.env;
 
 const DEV_SECRET = 'SECRET';
-const DEV_DB_HOST = 'mongodb://localhost:27017/bitfilmsdb_local';
+const DEV_DB_HOST = 'mongodb://localhost:27017/bitfilmsdb';
 const DEV_PORT = 3000;
 
 const DB = NODE_ENV === 'production' && DB_HOST ? DB_HOST : DEV_DB_HOST;
