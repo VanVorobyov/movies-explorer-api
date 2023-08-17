@@ -2,8 +2,9 @@ const User = require('../models/user');
 
 const NotFoundError = require('../utils/errors/notFoundError');
 const BadRequestError = require('../utils/errors/badRequestError');
+const ConflictError = require('../utils/errors/conflictError');
 
-const { USER_NOT_FOUND, INCORRECT_DATA_UPDATE_USER } = require('../utils/constants');
+const { USER_NOT_FOUND, INCORRECT_DATA_UPDATE_USER, EMAIL_ALREADY_EXISTS } = require('../utils/constants');
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
@@ -23,6 +24,8 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(INCORRECT_DATA_UPDATE_USER));
+      } else if (err.code === 11000) {
+        next(new ConflictError(EMAIL_ALREADY_EXISTS));
       } else {
         next(err);
       }
